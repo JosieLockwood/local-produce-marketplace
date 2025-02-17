@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-light-yellow: #E3E566;
+            --color-light-green: #A5CF61;
+            --color-medium-green: #6F9B3C;
+            --color-deep-green: #558257;
+            --color-dark-teal: #264E49;
+            --color-cream: #f5f5f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-dark-teal);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: var(--color-dark-teal);
+            padding: 1rem 2rem;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--color-light-yellow);
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-light-green);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--color-light-yellow);
+        }
+
+        .btn-login {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-medium-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .filters {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid var(--color-medium-green);
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            background-color: white;
+            color: var(--color-dark-teal);
+        }
+
+        .locality-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .locality-label {
+            color: var(--color-dark-teal);
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+
+        .locality-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            background: transparent;
+        }
+
+        .locality-btn.own_product {
+            border-color: var(--color-light-yellow);
+            color: var(--color-dark-teal);
+        }
+
+        .locality-btn.own_product.active {
+            background: var(--color-light-yellow);
+            color: var(--color-dark-teal);
+        }
+
+        .locality-btn.local_50 {
+            border-color: var(--color-medium-green);
+            color: var(--color-medium-green);
+        }
+
+        .locality-btn.regional_100 {
+            border-color: var(--color-medium-green);
+            color: var(--color-medium-green);
+        }
+
+        .locality-btn.uk {
+            border-color: var(--color-deep-green);
+            color: var(--color-deep-green);
+        }
+
+        .locality-btn.imported {
+            border-color: var(--color-dark-teal);
+            color: var(--color-dark-teal);
+        }
+
+        .locality-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .locality-btn.active.local_50 {
+            background: var(--color-medium-green);
+            color: white;
+        }
+
+        .locality-btn.active.regional_100 {
+            background: var(--color-medium-green);
+            color: white;
+        }
+
+        .locality-btn.active.uk {
+            background: var(--color-deep-green);
+            color: white;
+        }
+
+        .locality-btn.active.imported {
+            background: var(--color-dark-teal);
+            color: white;
+        }
+
+        .product-image-container {
+            position: relative;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .locality-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .locality-badge.own_product {
+            background: var(--color-light-yellow);
+            color: var(--color-dark-teal);
+        }
+
+        .locality-badge.local_50 {
+            background: var(--color-light-green);
+            color: var(--color-dark-teal);
+        }
+
+        .locality-badge.regional_100 {
+            background: var(--color-medium-green);
+            color: white;
+        }
+
+        .locality-badge.uk {
+            background: var(--color-deep-green);
+            color: white;
+        }
+
+        .locality-badge.imported {
+            background: var(--color-dark-teal);
+            color: white;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-info {
+            padding: 0.75rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-actions {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .quantity-selector label {
+            font-size: 0.9rem;
+            color: var(--color-dark-teal);
+        }
+
+        .quantity-selector input {
+            width: 50px;
+            padding: 0.3rem;
+            border: 1px solid var(--color-medium-green);
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .add-to-cart-btn {
+            padding: 0.5rem;
+            background-color: var(--color-medium-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        .product-title {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: var(--color-dark-teal);
+        }
+
+        .product-merchant {
+            color: var(--color-medium-green);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-location {
+            color: #666;
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 0.85rem;
+            margin: 0.5rem 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+
+        .product-price {
+            font-weight: 600;
+            color: var(--color-dark-teal);
+            margin: 0.5rem 0;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--color-deep-green);
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cart-count {
+            background: var(--color-light-yellow);
+            color: var(--color-dark-teal);
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+        }
+
+        .deselect-btn {
+            padding: 0.3rem 0.7rem;
+            border: 1px solid var(--color-dark-teal);
+            background: transparent;
+            color: var(--color-dark-teal);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .deselect-btn:hover {
+            background: var(--color-dark-teal);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/customer-portal/" class="logo">local</a>
+            <div class="nav-links">
+                <a href="/customer-portal/"><i class="fas fa-home"></i> Home</a>
+                <a href="/customer-portal/products.html" class="active"><i class="fas fa-shopping-basket"></i> Products</a>
+                <a href="/customer-portal/merchants.html"><i class="fas fa-store"></i> Merchants</a>
+                <a href="/customer-portal/cart.html">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                    <span id="cart-count" class="cart-count">0</span>
+                </a>
+                <a href="/customer-portal/account.html">
+                    <i class="fas fa-user"></i> Account
+                </a>
+                <button id="auth-button" class="btn-login">
+                    <i class="fas fa-user"></i>
+                    <span>Login</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="filters">
+            <select class="filter-select" id="category-filter">
+                <option value="">All Categories</option>
+                <option value="vegetables">Vegetables</option>
+                <option value="fruits">Fruits</option>
+                <option value="dairy">Dairy</option>
+                <option value="bakery">Bakery</option>
+            </select>
+            <select class="filter-select" id="merchant-filter">
+                <option value="">All Merchants</option>
+            </select>
+        </div>
+        <div class="locality-filters" id="locality-filters">
+            <span class="locality-label">Locality:</span>
+            <button class="deselect-btn" onclick="deselectLocality()">Deselect All</button>
+            <button class="locality-btn own_product active" data-locality="own_product">
+                <i class="fas fa-house-user"></i> Own Product
+            </button>
+            <button class="locality-btn local_50 active" data-locality="local_50">
+                <i class="fas fa-location-dot"></i> Within 50 Miles
+            </button>
+            <button class="locality-btn regional_100 active" data-locality="regional_100">
+                <i class="fas fa-map"></i> Within 100 Miles
+            </button>
+            <button class="locality-btn uk active" data-locality="uk">
+                <i class="fas fa-flag"></i> UK
+            </button>
+            <button class="locality-btn imported active" data-locality="imported">
+                <i class="fas fa-globe"></i> Imported
+            </button>
+        </div>
+        <div class="products-grid" id="products-container">
+            <!-- Products will be loaded here -->
+        </div>
+    </main>
+
+    <script>
+        // Initialize products array
+        let allProducts = [];
+
+        // Initialize active localities (all selected by default)
+        const activeLocalities = new Set(['own_product', 'local_50', 'regional_100', 'uk', 'imported']);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('Fetching products...');
+                const response = await fetch('/api/customer/browse/products');
+                console.log('Response:', response);
+                allProducts = await response.json();
+                console.log('Products loaded:', allProducts);
+                
+                loadMerchantFilter(allProducts);
+                displayProducts(allProducts);
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('products-container').innerHTML = '<p>Error loading products</p>';
+            }
+        });
+
+        function getLocalityLabel(locality) {
+            const labels = {
+                'own_product': 'Own Product',
+                'local_50': 'Within 50 Miles',
+                'regional_100': 'Within 100 Miles',
+                'uk': 'UK',
+                'imported': 'Imported'
+            };
+            return labels[locality] || locality;
+        }
+
+        function getLocalityIcon(locality) {
+            const icons = {
+                'own_product': 'fa-house-user',
+                'local_50': 'fa-location-dot',
+                'regional_100': 'fa-map',
+                'uk': 'fa-flag',
+                'imported': 'fa-globe'
+            };
+            return icons[locality] || 'fa-tag';
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('products-container');
+            const filteredProducts = filterProducts(products);
+
+            if (!filteredProducts.length) {
+                container.innerHTML = '<p>No products found</p>';
+                return;
+            }
+
+            container.innerHTML = filteredProducts.map(product => {
+                const merchantInfo = product.merchantId || {};
+                const merchantName = merchantInfo.businessName || 'Unknown';
+                const merchantLocation = merchantInfo.locationString || '';
+                
+                return `
+                    <div class="product-card" data-category="${product.category}" data-merchant="${merchantName}">
+                        <div class="product-image-container">
+                            <img src="${product.image || '/shared_images/product_placeholder.jpeg'}" alt="${product.item}" class="product-image">
+                            <div class="locality-badge ${product.localityCategory}">
+                                <i class="fas ${getLocalityIcon(product.localityCategory)}"></i>
+                                ${getLocalityLabel(product.localityCategory)}
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">${product.item}</h3>
+                            <p class="product-merchant">${merchantName}</p>
+                            <p class="product-location">${merchantLocation}</p>
+                            <p class="product-description">${product.description || ''}</p>
+                            <p class="product-price">£${product.price.toFixed(2)} / ${product.unit}</p>
+                            <div class="cart-actions">
+                                <div class="quantity-selector">
+                                    <label for="quantity-${product._id}">Qty:</label>
+                                    <input type="number" id="quantity-${product._id}" value="1" min="1" max="99">
+                                </div>
+                                <button onclick="addToCart('${product._id}')" class="add-to-cart-btn">
+                                    <i class="fas fa-cart-plus"></i>
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Add click handlers for locality filter buttons
+        document.querySelectorAll('.locality-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const locality = button.dataset.locality;
+                button.classList.toggle('active');
+                
+                if (button.classList.contains('active')) {
+                    activeLocalities.add(locality);
+                } else {
+                    activeLocalities.delete(locality);
+                }
+                
+                displayProducts(allProducts);
+            });
+        });
+
+        function filterProducts(products) {
+            const selectedCategory = document.getElementById('category-filter').value.toLowerCase();
+            const selectedMerchant = document.getElementById('merchant-filter').value;
+            
+            return products.filter(product => {
+                const categoryMatch = !selectedCategory || product.category.toLowerCase().includes(selectedCategory);
+                const merchantMatch = !selectedMerchant || product.merchantId.businessName === selectedMerchant;
+                const localityMatch = activeLocalities.has(product.localityCategory);
+                
+                return categoryMatch && merchantMatch && localityMatch;
+            });
+        }
+
+        function loadMerchantFilter(products) {
+            const merchants = [...new Set(products.map(p => p.merchantId.businessName || 'Unknown'))];
+            const select = document.getElementById('merchant-filter');
+            
+            merchants.forEach(merchant => {
+                const option = document.createElement('option');
+                option.value = merchant;
+                option.textContent = merchant;
+                select.appendChild(option);
+            });
+        }
+
+        // Add filter event listeners
+        document.getElementById('category-filter').addEventListener('change', () => displayProducts(allProducts));
+        document.getElementById('merchant-filter').addEventListener('change', () => displayProducts(allProducts));
+
+        // Simple cart implementation
+        function addToCart(productId) {
+            try {
+                // Get product and quantity
+                const product = allProducts.find(p => p._id === productId);
+                if (!product) return;
+
+                const quantity = parseInt(document.getElementById(`quantity-${productId}`).value) || 1;
+
+                // Get or create cart with simple structure
+                let cart = JSON.parse(localStorage.getItem('cart') || '{"items":[]}');
+
+                // Add item
+                const newItem = {
+                    id: product._id,
+                    name: product.item,
+                    price: product.price,
+                    quantity: quantity,
+                    unit: product.unit,
+                    image: product.image,
+                    merchant: {
+                        id: product.merchantId._id,
+                        name: product.merchantId.businessName
+                    }
+                };
+                
+                // Check if item exists
+                const existingItemIndex = cart.items.findIndex(item => item.id === productId);
+                if (existingItemIndex >= 0) {
+                    cart.items[existingItemIndex].quantity += quantity;
+                } else {
+                    cart.items.push(newItem);
+                }
+
+                // Save and update
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                showNotification(`Added ${quantity} ${product.item} to cart`);
+
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+            }
+        }
+
+        // Simple notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-check-circle"></i>
+                    ${message}
+                </div>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Simple cart counter
+        function updateCartCount() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '{"items":[]}');
+                const count = cart.items.reduce((total, item) => total + item.quantity, 0);
+                document.getElementById('cart-count').textContent = count;
+            } catch (error) {
+                document.getElementById('cart-count').textContent = '0';
+            }
+        }
+
+        // Initialize cart count
+        updateCartCount();
+
+        // Handle auth button
+        function updateAuthButton() {
+            const token = localStorage.getItem('token');
+            const authButton = document.getElementById('auth-button');
+            
+            if (token) {
+                authButton.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                authButton.onclick = () => {
+                    localStorage.removeItem('token');
+                    window.location.reload();
+                };
+            } else {
+                authButton.innerHTML = '<i class="fas fa-user"></i> Login';
+                authButton.onclick = () => {
+                    window.location.href = '/customer-portal/login.html';
+                };
+            }
+        }
+        updateAuthButton();
+
+        function deselectLocality() {
+            document.querySelectorAll('.locality-btn').forEach(btn => btn.classList.remove('active'));
+            activeLocalities.clear(); // Clear all active localities
+            displayProducts(allProducts);
+        }
+    </script>
+</body>
+</html>

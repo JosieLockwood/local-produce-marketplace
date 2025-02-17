@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products | local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-light-yellow: #E3E566;
+            --color-light-green: #A5CF61;
+            --color-medium-green: #6F9B3C;
+            --color-deep-green: #558257;
+            --color-dark-teal: #264E49;
+            --color-cream: #f5f5f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-dark-teal);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-dark-teal);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-dark-teal);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-medium-green);
+        }
+
+        .nav-links a.active {
+            color: var(--color-medium-green);
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: var(--color-dark-teal);
+        }
+
+        .primary-button {
+            background-color: var(--color-medium-green);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .primary-button:hover {
+            background-color: var(--color-deep-green);
+        }
+
+        .products-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--color-dark-teal);
+            color: white;
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background-color: var(--color-cream);
+        }
+
+        .auth-button {
+            background: none;
+            border: none;
+            color: var(--color-dark-teal);
+            font-family: 'Raleway', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .auth-button:hover {
+            color: var(--color-medium-green);
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .product-image-preview {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .image-upload {
+            margin-bottom: 1rem;
+        }
+
+        .image-upload label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--color-medium-green);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .image-upload input[type="file"] {
+            display: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem;
+            color: var(--color-dark-teal);
+        }
+
+        .action-button:hover {
+            color: var(--color-medium-green);
+        }
+
+        .action-button.delete:hover {
+            color: #dc3545;
+        }
+
+        .stock-toggle {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .in-stock {
+            background-color: var(--color-light-green);
+            color: var(--color-dark-teal);
+        }
+
+        .out-of-stock {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .status-badge.pending {
+            background-color: var(--color-light-yellow);
+            color: #856404;
+        }
+
+        .status-badge.approved {
+            background-color: var(--color-light-green);
+            color: var(--color-dark-teal);
+        }
+
+        .status-badge.delisted {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            position: relative;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-dark-teal);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .danger-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .danger-button:hover {
+            background-color: #c82333;
+        }
+
+        .secondary-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .secondary-button:hover {
+            background-color: #5a6268;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/merchant-portal/" class="logo">local</a>
+            <div class="nav-links">
+                <a href="/merchant-portal/"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/merchant-portal/products.html" class="active"><i class="fas fa-box"></i> Products</a>
+                <a href="/merchant-portal/orders.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <button id="auth-button" class="auth-button">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="header">
+            <h1>Manage Products</h1>
+            <button id="add-product-btn" class="primary-button">
+                <i class="fas fa-plus"></i> Add New Product
+            </button>
+        </div>
+
+        <div class="products-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Locality</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="products-list">
+                    <!-- Products will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Product Form Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New Product</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="product-form">
+                <div class="form-group">
+                    <label for="item">Product Name</label>
+                    <input type="text" id="item" name="item" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" id="price" name="price" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">Unit</label>
+                        <input type="text" id="unit" name="unit" placeholder="e.g., kg, bunch, piece" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select category</option>
+                            <option value="vegetables">Vegetables</option>
+                            <option value="fruits">Fruits</option>
+                            <option value="herbs">Herbs</option>
+                            <option value="dairy">Dairy</option>
+                            <option value="eggs">Eggs</option>
+                            <option value="meat">Meat</option>
+                            <option value="honey">Honey</option>
+                            <option value="preserves">Preserves</option>
+                            <option value="baked">Baked Goods</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="localityCategory">Locality</label>
+                        <select id="localityCategory" name="localityCategory" required>
+                            <option value="">Select locality</option>
+                            <option value="own_product">Own Product</option>
+                            <option value="local_50">Local (within 50 miles)</option>
+                            <option value="regional_100">Regional (within 100 miles)</option>
+                            <option value="uk">UK</option>
+                            <option value="imported">Imported</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Product Image</label>
+                    <div class="image-upload">
+                        <img id="image-preview" src="/shared_images/product_placeholder.jpeg" class="product-image-preview">
+                        <br>
+                        <label for="image">
+                            <i class="fas fa-upload"></i> Choose Image
+                        </label>
+                        <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="primary-button">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Delete Product</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="confirm-delete" class="danger-button">Delete</button>
+                <button class="secondary-button close-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/merchant-portal/login.html';
+        }
+
+        // Handle sign out
+        document.getElementById('auth-button').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/merchant-portal/login.html';
+        });
+
+        // API helper function
+        async function api(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            };
+
+            if (data) {
+                if (data instanceof FormData) {
+                    options.body = data;
+                } else {
+                    options.headers['Content-Type'] = 'application/json';
+                    options.body = JSON.stringify(data);
+                }
+            }
+
+            const response = await fetch(`/api/merchant/${endpoint}`, options);
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error.message || 'Server error');
+            }
+            return response.json();
+        }
+
+        // Form field helper
+        function getFormFields(form) {
+            return {
+                item: form.elements['item'].value,
+                description: form.elements['description'].value,
+                price: parseFloat(form.elements['price'].value),
+                unit: form.elements['unit'].value,
+                category: form.elements['category'].value,
+                localityCategory: form.elements['localityCategory'].value
+            };
+        }
+
+        // Set form fields helper
+        function setFormFields(form, data) {
+            form.elements['item'].value = data.item;
+            form.elements['description'].value = data.description;
+            form.elements['price'].value = data.price;
+            form.elements['unit'].value = data.unit;
+            form.elements['category'].value = data.category.toLowerCase();
+            form.elements['localityCategory'].value = data.localityCategory;
+            document.getElementById('image-preview').src = data.image || '/shared_images/product_placeholder.jpeg';
+        }
+
+        // Handle product form submission
+        document.getElementById('product-form').onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const formData = new FormData(e.target);
+                const endpoint = currentProductId ? `products/${currentProductId}` : 'products';
+                const method = currentProductId ? 'PUT' : 'POST';
+                
+                await api(endpoint, method, formData);
+                productModal.style.display = 'none';
+                loadProducts();
+            } catch (error) {
+                alert(error.message);
+            }
+        };
+
+        // Simplified modal event listeners
+        const closeModal = (modal) => modal.style.display = 'none';
+        
+        // Close on outside click
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal')) {
+                closeModal(event.target);
+            }
+        };
+
+        // Close on X button click
+        document.querySelectorAll('.close-button').forEach(button => {
+            button.onclick = () => closeModal(button.closest('.modal'));
+        });
+
+        // Edit product
+        async function editProduct(id) {
+            try {
+                const product = await api(`products/${id}`);
+                currentProductId = id;
+                
+                const form = document.getElementById('product-form');
+                setFormFields(form, product);
+                
+                document.getElementById('modal-title').textContent = 'Edit Product';
+                productModal.style.display = 'block';
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Load and display products
+        async function loadProducts() {
+            try {
+                const products = await api('products');
+                const tbody = document.getElementById('products-list');
+                tbody.innerHTML = '';
+
+                products.forEach(product => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <img src="${product.image || '/shared_images/product_placeholder.jpeg'}" 
+                                 alt="${product.item}" 
+                                 class="product-image">
+                        </td>
+                        <td>
+                            <strong>${product.item}</strong><br>
+                            <small>${product.description}</small>
+                        </td>
+                        <td>£${product.price.toFixed(2)} / ${product.unit}</td>
+                        <td>${product.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : ''}</td>
+                        <td>${formatLocality(product.localityCategory)}</td>
+                        <td>
+                            <button class="stock-toggle ${product.inStock ? 'in-stock' : 'out-of-stock'}"
+                                    onclick="toggleStock('${product._id}')"
+                                    ${product.status !== 'approved' ? 'disabled' : ''}>
+                                ${product.inStock ? 'In Stock' : 'Out of Stock'}
+                            </button>
+                        </td>
+                        <td>
+                            <span class="status-badge ${product.status}">
+                                ${product.status.charAt(0).toUpperCase() + product.status.slice(1)}
+                            </span>
+                        </td>
+                        <td class="action-buttons">
+                            <button class="action-button" onclick="editProduct('${product._id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-button delete" onclick="showDeleteModal('${product._id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Format locality for display
+        function formatLocality(locality) {
+            const formats = {
+                own_product: 'Own Product',
+                local_50: 'Local (50 miles)',
+                regional_100: 'Regional (100 miles)',
+                uk: 'UK',
+                imported: 'Imported'
+            };
+            return formats[locality] || locality;
+        }
+
+        // Modal handling
+        const productModal = document.getElementById('product-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        let currentProductId = null;
+
+        // Add new product button
+        document.getElementById('add-product-btn').onclick = () => {
+            document.getElementById('modal-title').textContent = 'Add New Product';
+            document.getElementById('product-form').reset();
+            currentProductId = null;
+            productModal.style.display = 'block';
+        };
+
+        // Toggle stock status
+        async function toggleStock(id) {
+            try {
+                await api(`products/${id}/stock`, 'PATCH');
+                loadProducts();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Delete product
+        function showDeleteModal(id) {
+            currentProductId = id;
+            deleteModal.style.display = 'block';
+        }
+
+        document.getElementById('confirm-delete').onclick = async () => {
+            try {
+                await api(`products/${currentProductId}`, 'DELETE');
+                deleteModal.style.display = 'none';
+                loadProducts();
+            } catch (error) {
+                alert(error.message);
+            }
+        };
+
+        // Image preview
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Load products on page load
+        loadProducts();
+    </script>
+</body>
+</html>

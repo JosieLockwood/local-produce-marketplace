@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-light-yellow: #E3E566;
+            --color-light-green: #A5CF61;
+            --color-medium-green: #6F9B3C;
+            --color-deep-green: #558257;
+            --color-dark-teal: #264E49;
+            --color-cream: #f5f5f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-dark-teal);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: var(--color-dark-teal);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-light-green);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--color-light-yellow);
+        }
+
+        .logo {
+            color: var(--color-light-yellow);
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .cart-count {
+            background: var(--color-light-yellow);
+            color: var(--color-dark-teal);
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+        }
+
+        .btn-login {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-medium-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hero {
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(rgba(38, 78, 73, 0.7), rgba(38, 78, 73, 0.7)), url('/shared_images/locally_grown.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 2rem;
+            margin-bottom: 4rem;
+            margin-top: 4rem;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero-logo {
+            width: 200px;
+            margin-bottom: 2rem;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .hero-text h1 span {
+            color: var(--color-light-yellow);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: var(--color-light-yellow);
+            color: var(--color-dark-teal);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .section {
+            max-width: 1200px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: var(--color-dark-teal);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .feature img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .feature-content {
+            padding: 1.5rem;
+        }
+
+        .feature h3 {
+            margin-bottom: 0.5rem;
+            color: var(--color-dark-teal);
+        }
+
+        .delivery-dates {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .delivery-date {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .delivery-date .date {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--color-dark-teal);
+            margin-bottom: 0.5rem;
+        }
+
+        .delivery-date .status {
+            color: var(--color-medium-green);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/customer-portal/" class="logo">local</a>
+            <div class="nav-links">
+                <a href="/customer-portal/" class="active"><i class="fas fa-home"></i> Home</a>
+                <a href="/customer-portal/products.html"><i class="fas fa-shopping-basket"></i> Products</a>
+                <a href="/customer-portal/merchants.html"><i class="fas fa-store"></i> Merchants</a>
+                <a href="/customer-portal/cart.html">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                    <span id="cart-count" class="cart-count">0</span>
+                </a>
+                <a href="/customer-portal/account.html">
+                    <i class="fas fa-user"></i> Account
+                </a>
+                <button id="auth-button" class="btn-login">
+                    <i class="fas fa-user"></i>
+                    <span>Login</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <img src="/shared_images/logo.png" alt="local" class="hero-logo">
+            <div class="hero-text">
+                <h1>Fresh <span>local</span> Produce</h1>
+            </div>
+            <p>Connecting you directly with farmers and independent producers in your area</p>
+            <a href="/customer-portal/products.html" class="cta-button">Shop Local Products</a>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Why Choose Local?</h2>
+        <div class="features">
+            <div class="feature">
+                <img src="/shared_images/locally_grown_2.jpeg" alt="Fresh Produce">
+                <div class="feature-content">
+                    <h3>Fresh & Seasonal</h3>
+                    <p>Get the freshest produce straight from local farms, harvested at peak ripeness.</p>
+                </div>
+            </div>
+            <div class="feature">
+                <img src="/shared_images/cows.jpeg" alt="Local Farms">
+                <div class="feature-content">
+                    <h3>Support Local Farms</h3>
+                    <p>Help sustain local agriculture and keep farming traditions alive in your community.</p>
+                </div>
+            </div>
+            <div class="feature">
+                <img src="/shared_images/meat.jpeg" alt="Quality Products">
+                <div class="feature-content">
+                    <h3>Quality & Trust</h3>
+                    <p>Know exactly where your food comes from and the farmers who produce it.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Upcoming Delivery Days</h2>
+        <div class="delivery-dates" id="delivery-dates">
+            <div class="delivery-date">
+                <div class="date">Loading...</div>
+                <div class="status">Please wait</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+            let count = 0;
+            for (const merchantId in cart) {
+                for (const itemId in cart[merchantId]) {
+                    count += cart[merchantId][itemId].quantity;
+                }
+            }
+            document.getElementById('cart-count').textContent = count;
+        }
+
+        // Auth button
+        function updateAuthButton() {
+            const token = localStorage.getItem('token');
+            const authButton = document.getElementById('auth-button');
+            
+            if (token) {
+                authButton.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                authButton.onclick = () => {
+                    localStorage.removeItem('token');
+                    window.location.reload();
+                };
+            } else {
+                authButton.innerHTML = '<i class="fas fa-user"></i> Login';
+                authButton.onclick = () => {
+                    window.location.href = '/customer-portal/login.html';
+                };
+            }
+        }
+
+        // Load delivery dates
+        async function loadDeliveryDates() {
+            try {
+                const response = await fetch('/api/customer/orders/delivery-dates');
+                const dates = await response.json();
+                
+                // Get next 3 upcoming dates
+                const upcomingDates = dates
+                    .filter(d => new Date(d.date) >= new Date())
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))
+                    .slice(0, 3);
+
+                const container = document.getElementById('delivery-dates');
+                
+                if (upcomingDates.length === 0) {
+                    container.innerHTML = '<p>No upcoming delivery dates</p>';
+                    return;
+                }
+
+                container.innerHTML = upcomingDates.map(date => `
+                    <div class="delivery-date">
+                        <div class="date">${new Date(date.date).toLocaleDateString('en-GB', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long'
+                        })}</div>
+                        <div class="status">${date.status === 'open' ? 'Open for Orders' : 'Closed'}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading delivery dates:', error);
+                container.innerHTML = '<p>Error loading delivery dates</p>';
+            }
+        }
+
+        // Initialize
+        updateCartCount();
+        updateAuthButton();
+        loadDeliveryDates();
+    </script>
+</body>
+</html>

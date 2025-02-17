@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products | Admin Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-light-yellow: #E3E566;
+            --color-light-green: #A5CF61;
+            --color-medium-green: #6F9B3C;
+            --color-deep-green: #558257;
+            --color-dark-teal: #264E49;
+            --color-cream: #f5f5f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-dark-teal);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-dark-teal);
+            font-weight: 700;
+            font-size: 1.5rem;
+            gap: 0.5rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-dark-teal);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-medium-green);
+        }
+
+        .nav-links a.active {
+            color: var(--color-medium-green);
+            font-weight: 600;
+        }
+
+        .auth-button {
+            background: none;
+            border: none;
+            color: var(--color-dark-teal);
+            font-family: 'Raleway', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .auth-button:hover {
+            color: var(--color-medium-green);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: var(--color-dark-teal);
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-button {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--color-dark-teal);
+            border-radius: 4px;
+            background: none;
+            color: var(--color-dark-teal);
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .filter-button.active {
+            background-color: var(--color-dark-teal);
+            color: white;
+        }
+
+        .products-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--color-dark-teal);
+            color: white;
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background-color: var(--color-cream);
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+
+        .status-badge.approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.delisted {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            padding: 0.25rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .action-button.approve {
+            background-color: var(--color-medium-green);
+            color: white;
+        }
+
+        .action-button.delist {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/admin-portal/" class="logo">
+                <img src="../shared_images/logo.png" alt="Local Logo">
+                local
+            </a>
+            <div class="nav-links">
+                <a href="/admin-portal/merchants.html">
+                    <i class="fas fa-store"></i> Merchants
+                </a>
+                <a href="/admin-portal/products.html" class="active">
+                    <i class="fas fa-box"></i> Products
+                </a>
+                <a href="/admin-portal/orders.html">
+                    <i class="fas fa-shopping-cart"></i> Orders
+                </a>
+                <a href="/admin-portal/deliveries.html">
+                    <i class="fas fa-truck"></i> Deliveries
+                </a>
+                <button id="logout-button" class="auth-button">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Manage Products</h1>
+        </div>
+
+        <div class="filters">
+            <button class="filter-button active" data-status="all">All</button>
+            <button class="filter-button" data-status="pending">Pending</button>
+            <button class="filter-button" data-status="approved">Approved</button>
+            <button class="filter-button" data-status="delisted">Delisted</button>
+        </div>
+
+        <div class="products-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th>Merchant</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Locality</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="products-list">
+                    <!-- Products will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Format locality for display
+        function formatLocality(locality) {
+            const formats = {
+                own_product: 'Own Product',
+                local_50: 'Local (50 miles)',
+                regional_100: 'Regional (100 miles)',
+                uk: 'UK',
+                imported: 'Imported'
+            };
+            return formats[locality] || locality;
+        }
+
+        // API helper function
+        async function api(endpoint, method = 'GET', data = null) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/admin-portal/';
+                return;
+            }
+
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+
+            if (data) {
+                options.headers['Content-Type'] = 'application/json';
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(`/api/admin/${endpoint}`, options);
+                if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/admin-portal/';
+                    return;
+                }
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Server error');
+                }
+                return response.json();
+            } catch (error) {
+                if (error.message === 'Unauthorized') {
+                    localStorage.removeItem('token');
+                    window.location.href = '/admin-portal/';
+                    return;
+                }
+                throw error;
+            }
+        }
+
+        // Load and display products
+        async function loadProducts(status = 'all') {
+            try {
+                const products = await api('products');
+                if (!products) return; // Stop if api call redirected
+                const tbody = document.getElementById('products-list');
+                tbody.innerHTML = '';
+
+                products
+                    .filter(product => status === 'all' || product.status === status)
+                    .forEach(product => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <img src="${product.image || '/shared_images/product_placeholder.jpeg'}" 
+                                     alt="${product.item}" 
+                                     class="product-image">
+                            </td>
+                            <td>
+                                <strong>${product.item}</strong><br>
+                                <small>${product.description}</small>
+                            </td>
+                            <td>
+                                <strong>${product.merchantId.businessName}</strong><br>
+                                <small>${product.merchantId.locationString}</small>
+                            </td>
+                            <td>£${product.price.toFixed(2)} / ${product.unit}</td>
+                            <td>${product.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : ''}</td>
+                            <td>${formatLocality(product.localityCategory)}</td>
+                            <td>
+                                <span class="status-badge ${product.status}">
+                                    ${product.status.charAt(0).toUpperCase() + product.status.slice(1)}
+                                </span>
+                            </td>
+                            <td class="action-buttons">
+                                <button 
+                                    onclick="updateStatus('${product._id}', 'approved')"
+                                    class="action-button approve"
+                                    ${product.status === 'approved' ? 'disabled' : ''}>
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                                <button 
+                                    onclick="updateStatus('${product._id}', 'delisted')"
+                                    class="action-button delist"
+                                    ${product.status === 'delisted' ? 'disabled' : ''}>
+                                    <i class="fas fa-ban"></i> Delist
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Update product status
+        async function updateStatus(id, status) {
+            try {
+                await api(`products/${id}/status`, 'PATCH', { status });
+                loadProducts(document.querySelector('.filter-button.active').dataset.status);
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                loadProducts(button.dataset.status);
+            });
+        });
+
+        // Logout
+        document.getElementById('logout-button').onclick = () => {
+            localStorage.removeItem('token');
+            window.location.href = '/admin-portal/';
+        };
+
+        // Check auth on page load
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/admin-portal/';
+        } else {
+            loadProducts();
+        }
+    </script>
+</body>
+</html>

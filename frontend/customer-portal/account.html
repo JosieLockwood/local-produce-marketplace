@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account | local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-light-yellow: #E3E566;
+            --color-light-green: #A5CF61;
+            --color-medium-green: #6F9B3C;
+            --color-deep-green: #558257;
+            --color-dark-teal: #264E49;
+            --color-cream: #f5f5f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-dark-teal);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: var(--color-dark-teal);
+            padding: 1rem 2rem;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--color-light-yellow);
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-light-green);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--color-light-yellow);
+        }
+
+        .btn-login {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-medium-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cart-count {
+            background: var(--color-light-yellow);
+            color: var(--color-dark-teal);
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+        }
+
+        .account-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: var(--color-dark-teal);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-light-green);
+        }
+
+        .order {
+            border: 1px solid var(--color-light-green);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-cream);
+        }
+
+        .order-items {
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .order-total {
+            text-align: right;
+            font-weight: 600;
+            color: var(--color-deep-green);
+        }
+
+        .account-info {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: 600;
+            min-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/customer-portal/" class="logo">local</a>
+            <div class="nav-links">
+                <a href="/customer-portal/"><i class="fas fa-home"></i> Home</a>
+                <a href="/customer-portal/products.html"><i class="fas fa-shopping-basket"></i> Products</a>
+                <a href="/customer-portal/merchants.html"><i class="fas fa-store"></i> Merchants</a>
+                <a href="/customer-portal/cart.html">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                    <span id="cart-count" class="cart-count">0</span>
+                </a>
+                <a href="/customer-portal/account.html" class="active">
+                    <i class="fas fa-user"></i> Account
+                </a>
+                <button id="auth-button" class="btn-login">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="account-container">
+        <div class="section">
+            <h2>Account Information</h2>
+            <div class="account-info">
+                <div class="info-item">
+                    <span class="info-label">Name:</span>
+                    <span id="user-name"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span id="user-email"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Order History</h2>
+            <div id="orders-list">
+                <!-- Orders will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            localStorage.setItem('redirectAfterLogin', window.location.href);
+            window.location.href = '/customer-portal/login.html';
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '{"items":[]}');
+                const count = cart.items.reduce((total, item) => total + item.quantity, 0);
+                document.getElementById('cart-count').textContent = count;
+            } catch (error) {
+                document.getElementById('cart-count').textContent = '0';
+            }
+        }
+
+        // Initialize cart count
+        updateCartCount();
+
+        // Handle auth button
+        function updateAuthButton() {
+            const authButton = document.getElementById('auth-button');
+            authButton.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            authButton.onclick = () => {
+                localStorage.removeItem('token');
+                window.location.href = '/customer-portal/';
+            };
+        }
+
+        // Load user info and orders
+        async function loadAccountData() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/customer-portal/login.html';
+                    return;
+                }
+
+                // Decode token to get user info (token is base64 encoded)
+                const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+                document.getElementById('user-name').textContent = tokenPayload.name;
+                document.getElementById('user-email').textContent = tokenPayload.email;
+
+                // Get orders
+                const ordersResponse = await fetch('/api/customer/orders/my-orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!ordersResponse.ok) {
+                    throw new Error('Failed to fetch orders');
+                }
+
+                const orders = await ordersResponse.json();
+                const ordersList = document.getElementById('orders-list');
+
+                if (orders.length === 0) {
+                    ordersList.innerHTML = '<p>No orders yet</p>';
+                    return;
+                }
+
+                ordersList.innerHTML = orders.map(order => `
+                    <div class="order">
+                        <div class="order-header">
+                            <div>
+                                <strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}
+                                <br>
+                                <strong>Delivery Date:</strong> ${new Date(order.deliveryDate.date).toLocaleDateString()}
+                            </div>
+                            <div>
+                                <strong>Status:</strong> ${order.status || 'Pending'}
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            ${order.merchantOrders.map(mo => mo.items.map(item => `
+                                <div class="order-item">
+                                    <span>${item.product.item} x ${item.quantity}</span>
+                                    <span>£${(item.price * item.quantity).toFixed(2)}</span>
+                                </div>
+                            `).join('')).join('')}
+                        </div>
+                        <div class="order-total">
+                            Total: £${order.totalAmount.toFixed(2)}
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading account data:', error);
+                if (error.message === 'Invalid token') {
+                    localStorage.removeItem('token');
+                    window.location.href = '/customer-portal/login.html';
+                }
+            }
+        }
+
+        // Initialize
+        updateAuthButton();
+        loadAccountData();
+    </script>
+</body>
+</html>

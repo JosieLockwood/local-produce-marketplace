@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart | local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-light-yellow: #E3E566;
+            --color-light-green: #A5CF61;
+            --color-medium-green: #6F9B3C;
+            --color-deep-green: #558257;
+            --color-dark-teal: #264E49;
+            --color-cream: #f5f5f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-dark-teal);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: var(--color-dark-teal);
+            padding: 1rem 2rem;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--color-light-yellow);
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-light-green);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--color-light-yellow);
+        }
+
+        .btn-login {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-medium-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cart-count {
+            background: var(--color-light-yellow);
+            color: var(--color-dark-teal);
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+        }
+
+        .cart-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .merchant-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .merchant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-light-green);
+        }
+
+        .merchant-header h2 {
+            color: var(--color-dark-teal);
+            font-weight: 600;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 80px 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-cream);
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .item-details h3 {
+            margin: 0;
+            color: var(--color-dark-teal);
+            font-weight: 600;
+        }
+
+        .item-details p {
+            color: var(--color-deep-green);
+            font-size: 0.9rem;
+        }
+
+        .item-price {
+            color: var(--color-deep-green);
+            font-weight: 500;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-controls button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--color-medium-green);
+            background: white;
+            color: var(--color-dark-teal);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .quantity-controls button:hover {
+            background: var(--color-medium-green);
+            color: white;
+        }
+
+        .quantity-controls input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid var(--color-light-green);
+            border-radius: 4px;
+            padding: 0.3rem;
+            color: var(--color-dark-teal);
+        }
+
+        .item-total {
+            font-weight: 600;
+            color: var(--color-deep-green);
+        }
+
+        .remove-item {
+            color: var(--color-dark-teal);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .remove-item:hover {
+            color: #dc3545;
+        }
+
+        .merchant-subtotal {
+            text-align: right;
+            padding-top: 1rem;
+            font-size: 1.1rem;
+            color: var(--color-dark-teal);
+            font-weight: 500;
+        }
+
+        .cart-summary {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .delivery-date {
+            margin-bottom: 1.5rem;
+        }
+
+        .delivery-date label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--color-dark-teal);
+            font-weight: 500;
+        }
+
+        .delivery-date select {
+            padding: 0.5rem;
+            border: 1px solid var(--color-light-green);
+            border-radius: 4px;
+            width: 200px;
+            color: var(--color-dark-teal);
+        }
+
+        .cart-total {
+            font-size: 1.25rem;
+            color: var(--color-dark-teal);
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-top: 2px solid var(--color-light-green);
+            font-weight: 600;
+        }
+
+        .place-order {
+            width: 100%;
+            padding: 1rem;
+            background: var(--color-deep-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 500;
+        }
+
+        .place-order:hover {
+            background: var(--color-dark-teal);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+            color: var(--color-dark-teal);
+        }
+
+        .empty-cart i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--color-medium-green);
+        }
+
+        .empty-cart h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-cart a {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--color-medium-green);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .empty-cart a:hover {
+            background: var(--color-deep-green);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/customer-portal/" class="logo">local</a>
+            <div class="nav-links">
+                <a href="/customer-portal/"><i class="fas fa-home"></i> Home</a>
+                <a href="/customer-portal/products.html"><i class="fas fa-shopping-basket"></i> Products</a>
+                <a href="/customer-portal/merchants.html"><i class="fas fa-store"></i> Merchants</a>
+                <a href="/customer-portal/cart.html" class="active">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                    <span id="cart-count" class="cart-count">0</span>
+                </a>
+                <a href="/customer-portal/account.html">
+                    <i class="fas fa-user"></i> Account
+                </a>
+                <button id="auth-button" class="btn-login">
+                    <i class="fas fa-user"></i>
+                    <span>Login</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="cart-container">
+        <div id="cart-content">
+            <!-- Cart items will be loaded here -->
+        </div>
+
+        <div class="cart-summary">
+            <div class="delivery-date">
+                <label for="delivery-date">Choose Delivery Date:</label>
+                <select id="delivery-date" required>
+                    <option value="">Select delivery date</option>
+                </select>
+            </div>
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total-amount">£0.00</span>
+            </div>
+            <button class="place-order" onclick="placeOrder()">Place Order</button>
+        </div>
+    </main>
+
+    <script>
+        // Set minimum date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('delivery-date').min = tomorrow.toISOString().split('T')[0];
+
+        function updateCartCount() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('cart') || '{"items":[]}');
+                const count = cart.items.reduce((total, item) => total + item.quantity, 0);
+                document.getElementById('cart-count').textContent = count;
+            } catch (error) {
+                document.getElementById('cart-count').textContent = '0';
+            }
+        }
+
+        function displayCart() {
+            const cartContent = document.getElementById('cart-content');
+            const cart = JSON.parse(localStorage.getItem('cart') || '{"items":[]}');
+
+            updateCartCount();
+
+            if (!cart.items.length) {
+                cartContent.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h2>Your cart is empty</h2>
+                        <p>Add some local products to your cart!</p>
+                        <a href="/customer-portal/products.html" class="continue-shopping">Continue Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group items by merchant
+            const merchantGroups = cart.items.reduce((groups, item) => {
+                const merchantId = item.merchant.id;
+                if (!groups[merchantId]) {
+                    groups[merchantId] = {
+                        name: item.merchant.name,
+                        items: []
+                    };
+                }
+                groups[merchantId].items.push(item);
+                return groups;
+            }, {});
+
+            let totalAmount = 0;
+            cartContent.innerHTML = Object.entries(merchantGroups).map(([merchantId, merchant]) => {
+                let merchantTotal = 0;
+                const itemsHtml = merchant.items.map(item => {
+                    const itemTotal = item.price * item.quantity;
+                    merchantTotal += itemTotal;
+                    return `
+                        <div class="cart-item">
+                            <img src="${item.image || '/shared_images/product_placeholder.jpeg'}" alt="${item.name}">
+                            <div class="item-details">
+                                <h3>${item.name}</h3>
+                                <p>${merchant.name}</p>
+                            </div>
+                            <div class="item-price">£${item.price.toFixed(2)} / ${item.unit}</div>
+                            <div class="quantity-controls">
+                                <button onclick="updateQuantity('${merchantId}', '${item.id}', -1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" value="${item.quantity}" min="1" 
+                                    onchange="updateQuantity('${merchantId}', '${item.id}', this.value, true)">
+                                <button onclick="updateQuantity('${merchantId}', '${item.id}', 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div class="item-total">£${itemTotal.toFixed(2)}</div>
+                            <button class="remove-item" onclick="removeItem('${merchantId}', '${item.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                totalAmount += merchantTotal;
+
+                return `
+                    <div class="merchant-section">
+                        <div class="merchant-header">
+                            <h2>${merchant.name}</h2>
+                        </div>
+                        ${itemsHtml}
+                        <div class="merchant-subtotal">
+                            Subtotal: £${merchantTotal.toFixed(2)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cart-total-amount').textContent = `£${totalAmount.toFixed(2)}`;
+        }
+
+        function updateQuantity(merchantId, itemId, change, isDirectInput = false) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '{"items":[]}');
+            const item = cart.items.find(item => item.id === itemId);
+            
+            if (!item) return;
+
+            if (isDirectInput) {
+                item.quantity = Math.max(1, parseInt(change));
+            } else {
+                item.quantity = Math.max(1, item.quantity + parseInt(change));
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+        }
+
+        function removeItem(merchantId, itemId) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '{"items":[]}');
+            cart.items = cart.items.filter(item => item.id !== itemId);
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+        }
+
+        async function loadDeliveryDates() {
+            try {
+                const response = await fetch('/api/customer/orders/delivery-dates');
+                const dates = await response.json();
+                
+                const select = document.getElementById('delivery-date');
+                select.innerHTML = '<option value="">Select delivery date</option>' +
+                    dates.map(d => `
+                        <option value="${d._id}">
+                            ${new Date(d.date).toLocaleDateString('en-GB', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long'
+                            })} (${d.slotsAvailable} slots available)
+                        </option>
+                    `).join('');
+            } catch (error) {
+                console.error('Error loading delivery dates:', error);
+                document.getElementById('delivery-date').innerHTML = 
+                    '<option value="">Error loading delivery dates</option>';
+            }
+        }
+
+        async function placeOrder() {
+            // Check if user is logged in
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // Save current URL to redirect back after login
+                localStorage.setItem('redirectAfterLogin', window.location.href);
+                window.location.href = '/customer-portal/login.html';
+                return;
+            }
+
+            const deliveryDateId = document.getElementById('delivery-date').value;
+            if (!deliveryDateId) {
+                alert('Please select a delivery date');
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('cart'));
+            if (!cart || !cart.items.length) {
+                alert('Your cart is empty');
+                return;
+            }
+
+            try {
+                // Convert cart to order format
+                const orderData = {
+                    merchantOrders: Object.entries(cart.items.reduce((groups, item) => {
+                        const merchantId = item.merchant.id;
+                        if (!groups[merchantId]) {
+                            groups[merchantId] = {
+                                merchant: merchantId,
+                                items: []
+                            };
+                        }
+                        groups[merchantId].items.push({
+                            product: item.id,
+                            quantity: item.quantity,
+                            price: item.price
+                        });
+                        return groups;
+                    }, {})).map(([merchantId, merchant]) => merchant),
+                    deliveryDateId,
+                    totalAmount: cart.items.reduce((total, item) => total + (item.price * item.quantity), 0)
+                };
+
+                // Place the order
+                const orderResponse = await fetch('/api/customer/orders/place-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (!orderResponse.ok) {
+                    const error = await orderResponse.json();
+                    // If token is invalid, redirect to login
+                    if (error.message === 'Token required' || error.message === 'Invalid token') {
+                        localStorage.removeItem('token');
+                        localStorage.setItem('redirectAfterLogin', window.location.href);
+                        window.location.href = '/customer-portal/login.html';
+                        return;
+                    }
+                    throw new Error(error.message || 'Failed to place order');
+                }
+
+                // Clear cart after successful order
+                localStorage.removeItem('cart');
+                
+                // Show success message and redirect
+                alert('Order placed successfully!');
+                window.location.href = '/customer-portal/orders.html';
+
+            } catch (error) {
+                alert(error.message || 'Failed to place order. Please try again.');
+            }
+        }
+
+        // Handle auth button
+        function updateAuthButton() {
+            const token = localStorage.getItem('token');
+            const authButton = document.getElementById('auth-button');
+            
+            if (token) {
+                authButton.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                authButton.onclick = () => {
+                    localStorage.removeItem('token');
+                    window.location.reload();
+                };
+            } else {
+                authButton.innerHTML = '<i class="fas fa-user"></i> Login';
+                authButton.onclick = () => {
+                    window.location.href = '/customer-portal/login.html';
+                };
+            }
+        }
+
+        // Initialize the cart display and load delivery dates
+        displayCart();
+        loadDeliveryDates();
+        updateAuthButton();
+    </script>
+</body>
+</html>
