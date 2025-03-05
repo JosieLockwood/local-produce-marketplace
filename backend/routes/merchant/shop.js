@@ -50,7 +50,7 @@ router.put('/', upload.single('image'), async (req, res) => {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
-        const { businessName, description, category, locationString } = req.body;
+        const { businessName, description, category, locationString, coordinates } = req.body;
         if (!businessName || !description || !category || !locationString) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
@@ -61,6 +61,9 @@ router.put('/', upload.single('image'), async (req, res) => {
             description !== shop.description ||
             category !== shop.category ||
             locationString !== shop.locationString ||
+            (coordinates && (!shop.coordinates || 
+                coordinates.lat !== shop.coordinates.lat || 
+                coordinates.lng !== shop.coordinates.lng)) ||
             req.file;
 
         if (hasChanges) {
@@ -68,6 +71,12 @@ router.put('/', upload.single('image'), async (req, res) => {
             shop.description = description;
             shop.category = category;
             shop.locationString = locationString;
+            if (coordinates) {
+                shop.coordinates = {
+                    lat: parseFloat(coordinates.lat),
+                    lng: parseFloat(coordinates.lng)
+                };
+            }
             shop.status = 'pending';
 
             if (req.file) {

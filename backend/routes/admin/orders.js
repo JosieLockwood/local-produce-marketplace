@@ -17,6 +17,34 @@ const verifyAdmin = async (req) => {
     }
 };
 
+// Bulk update order statuses
+router.patch('/bulk/status', async (req, res) => {
+    try {
+        const adminId = await verifyAdmin(req);
+        if (!adminId) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const { orderIds, status } = req.body;
+        if (!Array.isArray(orderIds) || orderIds.length === 0) {
+            return res.status(400).json({ message: 'Order IDs are required' });
+        }
+
+        if (!['pending', 'confirmed', 'all at depot', 'out for delivery', 'delivered'].includes(status)) {
+            return res.status(400).json({ message: 'Invalid status' });
+        }
+
+        const result = await Order.updateMany(
+            { _id: { $in: orderIds } },
+            { status }
+        );
+
+        res.json({ message: 'Orders updated successfully', count: result.modifiedCount });
+    } catch (err) {
+        res.status(500).json({ message: err.message || 'Server error' });
+    }
+});
+
 // List all orders with customer and merchant details
 router.get('/', async (req, res) => {
     try {
@@ -95,7 +123,7 @@ router.patch('/:orderId/status', async (req, res) => {
         }
 
         const { status } = req.body;
-        if (!['pending', 'confirmed', 'completed', 'cancelled'].includes(status)) {
+        if (!['pending', 'confirmed', 'all at depot', 'out for delivery', 'delivered'].includes(status)) {
             return res.status(400).json({ message: 'Invalid status' });
         }
 

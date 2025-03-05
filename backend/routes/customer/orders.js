@@ -84,7 +84,7 @@ router.get('/my-orders', async (req, res) => {
         console.log('Looking for orders with customer:', verified.id);
         const orders = await Order.find({ customer: verified.id })
             .populate('merchantOrders.merchant', 'businessName')
-            .populate('merchantOrders.items.product', 'item price unit')
+            .populate('merchantOrders.items.product', 'item price unit image')
             .populate('deliveryDate', 'date')
             .sort('-createdAt');
         
@@ -95,6 +95,35 @@ router.get('/my-orders', async (req, res) => {
         if (err.name === 'JsonWebTokenError') {
             return res.status(401).json({ message: 'Invalid token' });
         }
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Mark order as rated
+router.post('/:orderId/rate', async (req, res) => {
+    try {
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (!token) return res.status(401).json({ message: 'Token required' });
+
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        if (verified.role !== 'customer') {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        const order = await Order.findOne({ 
+            _id: req.params.orderId,
+            customer: verified.id
+        });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        order.isRated = true;
+        await order.save();
+        res.json({ message: 'Order marked as rated' });
+    } catch (error) {
+        console.error('Error marking order as rated:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

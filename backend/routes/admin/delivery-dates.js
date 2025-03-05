@@ -41,6 +41,7 @@ router.get('/', async (req, res) => {
                 date: date.date,
                 status: date.status,
                 orderCount: orders.length,
+                maxOrders: date.maxOrders,
                 totalAmount: totalAmount
             };
         }));
@@ -59,9 +60,13 @@ router.post('/', async (req, res) => {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
-        const { date } = req.body;
-        if (!date) {
-            return res.status(400).json({ message: 'Date is required' });
+        const { date, maxOrders } = req.body;
+        if (!date || !maxOrders) {
+            return res.status(400).json({ message: 'Date and maximum orders are required' });
+        }
+
+        if (maxOrders < 1) {
+            return res.status(400).json({ message: 'Maximum orders must be at least 1' });
         }
 
         // Set the time to midnight UTC
@@ -70,7 +75,8 @@ router.post('/', async (req, res) => {
 
         const newDeliveryDate = new DeliveryDate({
             date: deliveryDate,
-            status: 'open'
+            status: 'open',
+            maxOrders
         });
 
         await newDeliveryDate.save();
@@ -79,6 +85,86 @@ router.post('/', async (req, res) => {
         if (err.code === 11000) {
             return res.status(400).json({ message: 'Delivery date already exists' });
         }
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Update delivery date
+router.patch('/:id', async (req, res) => {
+    try {
+        const adminId = await verifyAdmin(req);
+        if (!adminId) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const { maxOrders, status } = req.body;
+        const updateData = {};
+
+        if (maxOrders !== undefined) {
+            if (maxOrders < 1) {
+                return res.status(400).json({ message: 'Maximum orders must be at least 1' });
+            }
+            updateData.maxOrders = maxOrders;
+        }
+
+        if (status !== undefined) {
+            if (!['open', 'closed', 'full'].includes(status)) {
+                return res.status(400).json({ message: 'Invalid status' });
+            }
+            updateData.status = status;
+        }
+
+        const deliveryDate = await DeliveryDate.findById(req.params.id);
+        if (!deliveryDate) {
+            return res.status(404).json({ message: 'Delivery date not found' });
+        }
+
+        if (deliveryDate.status === 'past') {
+            return res.status(400).json({ message: 'Cannot update past delivery dates' });
+        }
+
+        // If maxOrders is being reduced, check if it's still above current order count
+        if (maxOrders) {
+            const orderCount = await Order.countDocuments({ deliveryDate: deliveryDate._id });
+            if (orderCount > maxOrders) {
+                return res.status(400).json({ message: 'Cannot set maximum orders below current order count' });
+            }
+        }
+
+        Object.assign(deliveryDate, updateData);
+        await deliveryDate.save();
+        
+        // Check if status should be updated to full
+        await DeliveryDate.checkAndUpdateFullStatus(deliveryDate._id);
+
+        res.json(deliveryDate);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Delete delivery date
+router.delete('/:id', async (req, res) => {
+    try {
+        const adminId = await verifyAdmin(req);
+        if (!adminId) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const date = await DeliveryDate.findById(req.params.id);
+        if (!date) {
+            return res.status(404).json({ message: 'Delivery date not found' });
+        }
+
+        // Check if there are any orders for this date
+        const orderCount = await Order.countDocuments({ deliveryDate: date._id });
+        if (orderCount > 0) {
+            return res.status(400).json({ message: 'Cannot delete delivery date with orders' });
+        }
+
+        await date.deleteOne();
+        res.json({ message: 'Delivery date deleted' });
+    } catch (err) {
         res.status(500).json({ message: 'Server error' });
     }
 });

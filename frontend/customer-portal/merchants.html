@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
         :root {
             --color-light-yellow: #E3E566;
@@ -178,6 +179,33 @@
             border-radius: 1rem;
             font-weight: 600;
         }
+
+        .view-toggle {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--color-medium-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .view-toggle:hover {
+            background-color: var(--color-deep-green);
+        }
+
+        #merchant-map {
+            height: 400px;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -204,42 +232,120 @@
     </nav>
 
     <main class="main-content">
-        <div class="filters">
-            <select class="filter-select" id="location-filter">
-                <option value="">All Locations</option>
-            </select>
-            <select class="filter-select" id="category-filter">
-                <option value="">All Categories</option>
-                <option value="Fruit & Veg">Fruit & Veg</option>
-                <option value="Bakery">Bakery</option>
-                <option value="Butchers">Butchers</option>
-                <option value="Dairy">Dairy</option>
-                <option value="Farmer">Farmer</option>
-                <option value="Other">Other</option>
-            </select>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div class="filters">
+                <select class="filter-select" id="location-filter">
+                    <option value="">All Locations</option>
+                </select>
+                <select class="filter-select" id="category-filter">
+                    <option value="">All Categories</option>
+                    <option value="Fruit & Veg">Fruit & Veg</option>
+                    <option value="Bakery">Bakery</option>
+                    <option value="Butchers">Butchers</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Farmer">Farmer</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <button class="view-toggle" id="map-toggle">
+                <i class="fas fa-map-marked-alt"></i> Map View
+            </button>
         </div>
+
+        <div id="merchant-map"></div>
+        
         <div class="merchants-grid" id="merchants-container">
             <!-- Merchants will be loaded here -->
         </div>
     </main>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        let map;
+        let markers = [];
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch('/api/customer/browse/merchants');
                 const merchants = await response.json();
                 
-                // Load filters
-                loadLocationFilter(merchants);
-                
                 // Display merchants
                 displayMerchants(merchants);
                 
+                // Initialize map
+                map = L.map('merchant-map').setView([53.0233, -1.48119], 12);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    minZoom: 2,
+                    maxZoom: 20,
+                    maxNativeZoom: 19
+                }).addTo(map);
+
+                // Update map with merchant markers
+                updateMapMarkers(merchants);
+
+                // Load filters
+                loadLocationFilter(merchants);
+
+                // Handle map toggle
+                document.getElementById('map-toggle').addEventListener('click', function() {
+                    const mapElement = document.getElementById('merchant-map');
+                    const isVisible = mapElement.style.display === 'block';
+                    mapElement.style.display = isVisible ? 'none' : 'block';
+                    this.innerHTML = isVisible ? 
+                        '<i class="fas fa-map-marked-alt"></i> Map View' : 
+                        '<i class="fas fa-list"></i> List View';
+                    if (!isVisible) {
+                        // Refresh map when showing it
+                        map.invalidateSize();
+                    }
+                });
+
+                // Add filter handlers that update both list and map
+                document.getElementById('location-filter').addEventListener('change', () => {
+                    const filteredMerchants = filterMerchants();
+                    updateMapMarkers(filteredMerchants);
+                });
+                document.getElementById('category-filter').addEventListener('change', () => {
+                    const filteredMerchants = filterMerchants();
+                    updateMapMarkers(filteredMerchants);
+                });
+
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('merchants-container').innerHTML = '<p>Error loading merchants</p>';
             }
         });
+
+        function updateMapMarkers(merchants) {
+            // Clear existing markers
+            markers.forEach(marker => marker.remove());
+            markers = [];
+
+            // Add new markers
+            const bounds = L.latLngBounds();
+            merchants.forEach(merchant => {
+                if (merchant.coordinates && merchant.coordinates.lat && merchant.coordinates.lng) {
+                    const marker = L.marker([merchant.coordinates.lat, merchant.coordinates.lng])
+                        .bindPopup(`
+                            <div style="text-align: center;">
+                                <strong>${merchant.businessName}</strong><br>
+                                <em>${merchant.category}</em><br>
+                                ${merchant.locationString}<br>
+                                <a href="/customer-portal/merchant.html?id=${merchant._id}" class="shop-products-btn" style="display: inline-block; margin-top: 8px;">View Shop</a>
+                            </div>
+                        `);
+                    marker.addTo(map);
+                    markers.push(marker);
+                    bounds.extend([merchant.coordinates.lat, merchant.coordinates.lng]);
+                }
+            });
+
+            // Fit map to show all markers if we have any
+            if (markers.length > 0) {
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
 
         function loadLocationFilter(merchants) {
             const locations = [...new Set(merchants.map(m => m.locationString))];
@@ -269,7 +375,7 @@
                         <h3 class="merchant-name">${merchant.businessName}</h3>
                         <p class="merchant-description">${merchant.description}</p>
                         <p class="merchant-location"><i class="fas fa-location-dot"></i> ${merchant.locationString}</p>
-                        <a href="/customer-portal/products.html?merchant=${merchant._id}" class="shop-products-btn">
+                        <a href="/customer-portal/merchant.html?id=${merchant._id}" class="shop-products-btn">
                             <i class="fas fa-basket-shopping"></i> View Products
                         </a>
                     </div>
@@ -291,6 +397,13 @@
                 const categoryMatch = !selectedCategory || category === selectedCategory;
                 
                 card.style.display = locationMatch && categoryMatch ? 'block' : 'none';
+            });
+
+            const merchants = JSON.parse(localStorage.getItem('merchants'));
+            return merchants.filter(merchant => {
+                const locationMatch = !selectedLocation || merchant.locationString === selectedLocation;
+                const categoryMatch = !selectedCategory || merchant.category === selectedCategory;
+                return locationMatch && categoryMatch;
             });
         }
 

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics | local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-light-yellow: #E3E566;
+            --color-light-green: #A5CF61;
+            --color-medium-green: #6F9B3C;
+            --color-deep-green: #558257;
+            --color-dark-teal: #264E49;
+            --color-cream: #f5f5f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-dark-teal);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-dark-teal);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-dark-teal);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a.active {
+            color: var(--color-medium-green);
+        }
+
+        .auth-button {
+            background: none;
+            border: none;
+            color: var(--color-dark-teal);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            flex: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid var(--color-medium-green);
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            color: var(--color-dark-teal);
+        }
+
+        .stats-table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stats-table th {
+            background: var(--color-dark-teal);
+            color: white;
+            font-weight: 500;
+        }
+
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .rating-stars {
+            color: #ffd700;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            max-width: 600px;
+            max-height: 80vh;
+            margin: 5vh auto;
+            border-radius: 8px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-dark-teal);
+        }
+
+        .review-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-rating {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-comment {
+            color: var(--color-dark-teal);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .status-badge.delivered {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .status-badge.cancelled {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/merchant-portal/" class="logo">local</a>
+            <div class="nav-links">
+                <a href="/merchant-portal/"><i class="fas fa-home"></i> Home</a>
+                <a href="/merchant-portal/products.html"><i class="fas fa-box"></i> Products</a>
+                <a href="/merchant-portal/orders.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="/merchant-portal/statistics.html" class="active"><i class="fas fa-chart-bar"></i> Statistics</a>
+                <button id="auth-button" class="auth-button">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Product Statistics</h1>
+            <div class="filters">
+                <select id="sort-by" class="filter-select">
+                    <option value="orders">Sort by Orders</option>
+                    <option value="rating">Sort by Rating</option>
+                </select>
+                <select id="rating-filter" class="filter-select">
+                    <option value="all">All Ratings</option>
+                    <option value="0-1">0-1 Stars</option>
+                    <option value="1-2">1-2 Stars</option>
+                    <option value="2-3">2-3 Stars</option>
+                    <option value="3-4">3-4 Stars</option>
+                    <option value="4-5">4-5 Stars</option>
+                </select>
+            </div>
+        </div>
+
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Rating</th>
+                    <th>Total Reviews</th>
+                    <th>Orders</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody id="stats-table-body">
+                <!-- Product stats will be loaded here -->
+            </tbody>
+        </table>
+
+        <div class="header" style="margin-top: 3rem;">
+            <h1>Order Statistics</h1>
+        </div>
+
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Delivery Date</th>
+                    <th>Status</th>
+                    <th>Total Orders</th>
+                </tr>
+            </thead>
+            <tbody id="order-stats-table-body">
+                <!-- Order stats will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Reviews Modal -->
+    <div id="reviews-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeReviewsModal()">&times;</span>
+            <h2 id="reviews-modal-title"></h2>
+            <div id="reviews-list">
+                <!-- Reviews will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/merchant-portal/login.html';
+        }
+
+        let productStats = [];
+
+        async function loadStats() {
+            try {
+                // Load product stats
+                const productResponse = await fetch('/api/merchant/stats/products', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!productResponse.ok) {
+                    if (productResponse.status === 401) {
+                        window.location.href = '/merchant-portal/login.html';
+                        return;
+                    }
+                    throw new Error('Failed to load product stats');
+                }
+
+                productStats = await productResponse.json();
+                displayStats();
+
+                // Load order stats
+                const orderResponse = await fetch('/api/merchant/stats/orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!orderResponse.ok) {
+                    throw new Error('Failed to load order stats');
+                }
+
+                const orderStats = await orderResponse.json();
+                displayOrderStats(orderStats);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function displayStats() {
+            const tbody = document.getElementById('stats-table-body');
+            const sortBy = document.getElementById('sort-by').value;
+            const ratingFilter = document.getElementById('rating-filter').value;
+
+            // Filter products by rating range
+            let filteredProducts = [...productStats];
+            if (ratingFilter !== 'all') {
+                const [min, max] = ratingFilter.split('-').map(Number);
+                filteredProducts = filteredProducts.filter(p => 
+                    p.avgRating >= min && p.avgRating <= max
+                );
+            }
+
+            // Sort products
+            filteredProducts.sort((a, b) => {
+                if (sortBy === 'orders') {
+                    return b.orderCount - a.orderCount;
+                } else {
+                    return b.avgRating - a.avgRating;
+                }
+            });
+
+            tbody.innerHTML = filteredProducts.map(product => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="${product.image}" alt="${product.item}" class="product-image">
+                            <span>${product.item}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="rating-stars" onclick="showReviews('${product._id}', '${product.item}')">
+                            ${getStarRating(product.avgRating)}
+                        </span>
+                    </td>
+                    <td>${product.totalRatings}</td>
+                    <td>${product.orderCount}</td>
+                    <td>£${product.price.toFixed(2)}/${product.unit}</td>
+                </tr>
+            `).join('');
+        }
+
+        function getStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+            
+            return `${`<i class="fas fa-star"></i>`.repeat(fullStars)}
+                    ${halfStar ? `<i class="fas fa-star-half-alt"></i>` : ''}
+                    ${`<i class="far fa-star"></i>`.repeat(emptyStars)}
+                    <span style="color: var(--color-dark-teal); margin-left: 0.5rem;">${rating.toFixed(1)}</span>`;
+        }
+
+        function showReviews(productId, productName) {
+            const product = productStats.find(p => p._id === productId);
+            if (!product) return;
+
+            const reviewsList = document.getElementById('reviews-list');
+            document.querySelector('#reviews-modal-title').textContent = `Reviews for ${productName}`;
+            
+            reviewsList.innerHTML = product.ratings.length ? product.ratings.map(review => `
+                <div class="review-item">
+                    <div class="review-rating">
+                        ${getStarRating(review.rating)}
+                    </div>
+                    <div class="review-comment">${review.comment}</div>
+                </div>
+            `).join('') : '<p>No reviews yet</p>';
+
+            document.getElementById('reviews-modal').style.display = 'block';
+        }
+
+        function closeReviewsModal() {
+            document.getElementById('reviews-modal').style.display = 'none';
+        }
+
+        function displayOrderStats(orderStats) {
+            const tbody = document.getElementById('order-stats-table-body');
+            tbody.innerHTML = orderStats.map(stat => `
+                <tr>
+                    <td>${new Date(stat.date).toLocaleDateString('en-GB')}</td>
+                    <td>
+                        <span class="status-badge ${stat.status}">
+                            ${stat.status}
+                        </span>
+                    </td>
+                    <td>${stat.totalOrders}</td>
+                </tr>
+            `).join('');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/merchant-portal/login.html';
+        }
+
+        // Event listeners
+        document.getElementById('sort-by').addEventListener('change', displayStats);
+        document.getElementById('rating-filter').addEventListener('change', displayStats);
+        document.getElementById('auth-button').addEventListener('click', logout);
+
+        // Initialize
+        loadStats();
+    </script>
+</body>
+</html>

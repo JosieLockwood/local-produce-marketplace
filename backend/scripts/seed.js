@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
@@ -5,7 +6,7 @@ const MerchantShop = require('../models/MerchantShop');
 const Product = require('../models/Product');
 const DeliveryDate = require('../models/DeliveryDate');
 
-mongoose.connect('mongodb://localhost:27017/local-produce', {
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });

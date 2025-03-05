@@ -55,12 +55,16 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+        enum: ['pending', 'confirmed', 'all at depot', 'out for delivery', 'delivered'],
         default: 'pending'
     },
     totalAmount: { 
         type: Number, 
         required: true 
+    },
+    isRated: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

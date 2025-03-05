@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
+    "dev": "NODE_ENV=development nodemon -r dotenv/config backend/server.js dotenv_config_path=.env.local",
     "seed": "node backend/scripts/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

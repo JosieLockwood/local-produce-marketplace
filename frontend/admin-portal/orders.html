@@ -148,9 +148,10 @@
         }
 
         th, td {
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             text-align: left;
             border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
         }
 
         th {
@@ -159,73 +160,175 @@
             font-weight: 600;
         }
 
-        tbody tr:hover {
+        .order-row {
+            background-color: white;
+            border-top: 8px solid var(--color-cream);
+        }
+
+        .order-row:first-child {
+            border-top: none;
+        }
+
+        .merchant-section {
             background-color: var(--color-cream);
+            transition: all 0.2s ease;
+        }
+
+        .merchant-section.hidden {
+            display: none;
+        }
+
+        .merchant-orders {
+            padding: 1rem;
         }
 
         .merchant-order {
-            background-color: var(--color-cream);
+            background: white;
             padding: 1rem;
-            margin: 0.5rem 0;
+            margin-bottom: 0.5rem;
             border-radius: 4px;
         }
 
-        .order-row {
-            background-color: white;
+        .merchant-order:last-child {
+            margin-bottom: 0;
         }
 
-        .merchant-row {
+        .merchant-header {
+            margin-bottom: 0.5rem;
+        }
+
+        .merchant-header strong {
+            display: block;
+            color: var(--color-dark-teal);
+        }
+
+        .merchant-header small {
+            color: #666;
+        }
+
+        .merchant-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .merchant-items {
+            flex: 1;
+        }
+
+        .merchant-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toggle-merchants {
+            background: none;
+            border: 1px solid #ddd;
+            color: var(--color-dark-teal);
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-merchants:hover {
             background-color: var(--color-cream);
         }
 
-        .merchant-row td {
-            padding-left: 2rem;
+        .toggle-merchants i {
+            transition: transform 0.2s;
         }
 
-        .merchant-row td:first-child {
-            position: relative;
-        }
-
-        .merchant-row td:first-child:before {
-            content: '└';
-            position: absolute;
-            left: 1rem;
-            color: #999;
+        .toggle-merchants.expanded i {
+            transform: rotate(180deg);
         }
 
         .status-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 500;
+            text-transform: capitalize;
+            display: inline-block;
+            transition: background-color 0.2s, color 0.2s;
         }
 
-        .status-badge.created {
-            background-color: #ffeeba;
+        .status-badge.pending {
+            background-color: #fff3cd;
             color: #856404;
         }
 
-        .status-badge.ready {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-badge.at-depot {
+        .status-badge.confirmed {
             background-color: #cce5ff;
             color: #004085;
         }
 
+        .status-badge.all-at-depot {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+
+        .status-badge.out-for-delivery {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-badge.delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .status-select {
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-family: 'Raleway', sans-serif;
-            margin-left: 0.5rem;
+            font-size: 0.8rem;
         }
 
-        .total {
-            font-weight: 600;
-            color: var(--color-dark-teal);
+        .bulk-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .primary-button {
+            background-color: var(--color-medium-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 500;
+        }
+
+        .primary-button:hover {
+            background-color: var(--color-deep-green);
+        }
+
+        .primary-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .order-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -261,25 +364,36 @@
             <h1>Manage Orders</h1>
         </div>
 
+        <div class="bulk-actions">
+            <select id="bulk-status" class="status-select" disabled>
+                <option value="">Change Status</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="all at depot">All at Depot</option>
+                <option value="out for delivery">Out for Delivery</option>
+                <option value="delivered">Delivered</option>
+            </select>
+            <button id="bulk-update-btn" class="primary-button" disabled>Update Selected Orders</button>
+        </div>
+
         <select id="date-filter" class="date-filter">
             <option value="">All Delivery Dates</option>
-            <!-- Delivery dates will be loaded here -->
         </select>
 
         <div class="orders-table">
             <table>
                 <thead>
                     <tr>
-                        <th>Order Details</th>
-                        <th>Customer</th>
-                        <th>Items</th>
-                        <th>Status</th>
-                        <th>Amount</th>
+                        <th style="width: 5%">
+                            <input type="checkbox" id="select-all">
+                        </th>
+                        <th style="width: 20%">Order Details</th>
+                        <th style="width: 25%">Customer</th>
+                        <th style="width: 15%">Total</th>
+                        <th style="width: 35%">Status</th>
                     </tr>
                 </thead>
-                <tbody id="orders-list">
-                    <!-- Orders will be loaded here -->
-                </tbody>
+                <tbody id="orders-list"></tbody>
             </table>
         </div>
     </div>
@@ -380,17 +494,23 @@
                     orderRow.className = 'order-row';
                     orderRow.innerHTML = `
                         <td>
-                            <strong>Order #${order._id.slice(-6)}</strong><br>
+                            <input type="checkbox" 
+                                class="order-checkbox" 
+                                data-order-id="${order._id}"
+                                onchange="toggleOrderSelection('${order._id}', this)">
+                        </td>
+                        <td class="order-info">
+                            <strong>Order #${order._id.slice(-6)}</strong>
                             <small>${order.deliveryDate ? formatDate(order.deliveryDate.date) : 'No delivery date'}</small>
                         </td>
-                        <td>
-                            <strong>${order.customer ? order.customer.name : 'Unknown'}</strong><br>
+                        <td class="order-info">
+                            <strong>${order.customer ? order.customer.name : 'Unknown'}</strong>
                             <small>${order.customer ? order.customer.email : ''}</small>
                         </td>
-                        <td></td>
-                        <td>
-                            <span class="status-badge ${order.status || 'pending'}">
-                                ${(order.status || 'pending').charAt(0).toUpperCase() + (order.status || 'pending').slice(1)}
+                        <td class="total">£${order.totalAmount.toFixed(2)}</td>
+                        <td class="status-cell">
+                            <span class="status-badge ${order.status.replace(/\s+/g, '-')}">
+                                ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                             </span>
                             <select 
                                 class="status-select" 
@@ -398,38 +518,58 @@
                                 <option value="">Change Status</option>
                                 <option value="pending">Pending</option>
                                 <option value="confirmed">Confirmed</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
+                                <option value="all at depot">All at Depot</option>
+                                <option value="out for delivery">Out for Delivery</option>
+                                <option value="delivered">Delivered</option>
                             </select>
                         </td>
-                        <td class="total">£${order.totalAmount.toFixed(2)}</td>
                     `;
                     tbody.appendChild(orderRow);
 
                     // Merchant order rows
-                    order.merchantOrders.forEach(mo => {
+                    if (order.merchantOrders.length > 0) {
                         const merchantRow = document.createElement('tr');
-                        merchantRow.className = 'merchant-row';
+                        merchantRow.className = 'merchant-section hidden';
+                        merchantRow.dataset.orderId = order._id;
                         merchantRow.innerHTML = `
-                            <td>
-                                <strong>${mo.merchant ? mo.merchant.businessName : 'Unknown Merchant'}</strong><br>
-                                <small>${mo.merchant ? mo.merchant.locationString : ''}</small>
+                            <td colspan="5">
+                                <div class="merchant-orders">
+                                    ${order.merchantOrders.map(mo => `
+                                        <div class="merchant-order">
+                                            <div class="merchant-header">
+                                                <strong>${mo.merchant ? mo.merchant.businessName : 'Unknown Merchant'}</strong>
+                                                <small>${mo.merchant ? mo.merchant.locationString : ''}</small>
+                                            </div>
+                                            <div class="merchant-details">
+                                                <div class="merchant-items">
+                                                    ${mo.items.map(item => 
+                                                        item.product ? `${item.product.item} (${item.quantity} ${item.product.unit})` : `Unknown Product (${item.quantity})`
+                                                    ).join(', ')}
+                                                </div>
+                                                <div class="merchant-status">
+                                                    <span class="status-badge ${mo.status.replace(/\s+/g, '-')}">
+                                                        ${mo.status.charAt(0).toUpperCase() + mo.status.slice(1)}
+                                                    </span>
+                                                    <span>£${mo.items.reduce((sum, item) => 
+                                                        sum + (item.price * item.quantity), 0
+                                                    ).toFixed(2)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </td>
-                            <td></td>
-                            <td>${mo.items.map(item => 
-                                item.product ? `${item.product.item} (${item.quantity} ${item.product.unit})` : `Unknown Product (${item.quantity})`
-                            ).join(', ')}</td>
-                            <td>
-                                <span class="status-badge ${mo.status}">
-                                    ${mo.status.charAt(0).toUpperCase() + mo.status.slice(1)}
-                                </span>
-                            </td>
-                            <td>£${mo.items.reduce((sum, item) => 
-                                sum + (item.price * item.quantity), 0
-                            ).toFixed(2)}</td>
                         `;
                         tbody.appendChild(merchantRow);
-                    });
+
+                        // Add toggle button to main row
+                        const statusCell = orderRow.querySelector('.status-cell');
+                        const toggleButton = document.createElement('button');
+                        toggleButton.className = 'toggle-merchants';
+                        toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show Merchants';
+                        toggleButton.onclick = () => toggleMerchants(order._id);
+                        statusCell.appendChild(toggleButton);
+                    }
                 });
             } catch (error) {
                 alert(error.message);
@@ -453,6 +593,70 @@
         } else {
             loadDeliveryDates();
             loadOrders();
+        }
+
+        let selectedOrders = new Set();
+
+        function updateBulkActionControls() {
+            const bulkStatus = document.getElementById('bulk-status');
+            const bulkUpdateBtn = document.getElementById('bulk-update-btn');
+
+            if (selectedOrders.size > 0) {
+                bulkStatus.disabled = false;
+                bulkUpdateBtn.disabled = false;
+            } else {
+                bulkStatus.disabled = true;
+                bulkUpdateBtn.disabled = true;
+            }
+        }
+
+        function toggleOrderSelection(orderId, checkbox) {
+            if (checkbox.checked) {
+                selectedOrders.add(orderId);
+            } else {
+                selectedOrders.delete(orderId);
+                document.getElementById('select-all').checked = false;
+            }
+            updateBulkActionControls();
+        }
+
+        document.getElementById('select-all').onchange = (e) => {
+            const checkboxes = document.querySelectorAll('.order-checkbox[data-order-id]');
+            checkboxes.forEach(cb => {
+                cb.checked = e.target.checked;
+                toggleOrderSelection(cb.dataset.orderId, cb);
+            });
+        };
+
+        document.getElementById('bulk-update-btn').onclick = async () => {
+            const status = document.getElementById('bulk-status').value;
+            if (!status || selectedOrders.size === 0) return;
+
+            try {
+                const response = await api('orders/bulk/status', 'PATCH', {
+                    orderIds: Array.from(selectedOrders),
+                    status
+                });
+
+                selectedOrders.clear();
+                document.getElementById('select-all').checked = false;
+                updateBulkActionControls();
+                loadOrders(document.getElementById('date-filter').value);
+            } catch (error) {
+                console.error('Error updating orders:', error);
+                alert('Failed to update orders');
+            }
+        };
+
+        function toggleMerchants(orderId) {
+            const section = document.querySelector(`.merchant-section[data-order-id="${orderId}"]`);
+            const toggleButton = document.querySelector(`.toggle-merchants[data-order-id="${orderId}"]`);
+            const isHidden = section.classList.contains('hidden');
+            
+            section.classList.toggle('hidden');
+            toggleButton.innerHTML = isHidden ? 
+                '<i class="fas fa-chevron-up"></i> Hide Merchants' : 
+                '<i class="fas fa-chevron-down"></i> Show Merchants';
         }
     </script>
 </body>

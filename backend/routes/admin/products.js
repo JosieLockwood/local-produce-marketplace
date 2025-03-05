@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
                 path: 'merchantId',
                 select: 'businessName locationString'
             })
-            .sort({ createdAt: -1 });
+            .sort('-createdAt');
 
         res.json(products);
     } catch (err) {
@@ -47,7 +47,7 @@ router.patch('/:id/status', async (req, res) => {
         }
 
         const { status } = req.body;
-        if (!['pending', 'approved', 'delisted'].includes(status)) {
+        if (!['active', 'inactive'].includes(status)) {
             return res.status(400).json({ message: 'Invalid status' });
         }
 
@@ -55,10 +55,7 @@ router.patch('/:id/status', async (req, res) => {
             req.params.id,
             { status },
             { new: true }
-        ).populate({
-            path: 'merchantId',
-            select: 'businessName locationString'
-        });
+        ).populate('merchantId', 'businessName locationString');
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });

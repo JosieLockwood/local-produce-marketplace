@@ -17,10 +17,7 @@ app.use(express.json());
 app.use(express.static('frontend'));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('Could not connect to MongoDB:', err));
 
@@ -38,12 +35,14 @@ app.use('/api/admin/delivery-dates', require('./routes/admin/delivery-dates'));
 // Customer Routes
 app.use('/api/customer/browse', require('./routes/customer/browse'));
 app.use('/api/customer/orders', require('./routes/customer/orders'));
+app.use('/api/customer/ratings', require('./routes/customer/ratings'));
 
 // Merchant Routes
 app.use('/api/merchant/products', require('./routes/merchant/products'));
 app.use('/api/merchant/orders', require('./routes/merchant/orders'));
 app.use('/api/merchant/shop', require('./routes/merchant/shop'));
 app.use('/api/merchant/delivery-dates', require('./routes/merchant/delivery-dates'));
+app.use('/api/merchant/stats', require('./routes/merchant/stats'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

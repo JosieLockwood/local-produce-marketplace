@@ -96,33 +96,35 @@
         }
 
         .hero {
-            height: 70vh;
+            position: relative;
+            height: 60vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            background: linear-gradient(rgba(38, 78, 73, 0.7), rgba(38, 78, 73, 0.7)), url('/shared_images/locally_grown.jpeg');
+            background: linear-gradient(rgba(38, 78, 73, 0.6), rgba(38, 78, 73, 0.8)), url('/shared_images/home_image.jpeg');
             background-size: cover;
             background-position: center;
             color: white;
             padding: 2rem;
             margin-bottom: 4rem;
             margin-top: 4rem;
+            border-bottom: 4px solid var(--color-cream);
         }
 
         .hero-content {
             max-width: 800px;
-        }
-
-        .hero-logo {
-            width: 200px;
-            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-text h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
             color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-weight: 700;
+            line-height: 1.2;
         }
 
         .hero-text h1 span {
@@ -130,24 +132,34 @@
         }
 
         .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 500;
         }
 
         .cta-button {
             display: inline-block;
-            padding: 1rem 2rem;
+            padding: 1.2rem 2.5rem;
             background-color: var(--color-light-yellow);
             color: var(--color-dark-teal);
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-weight: 600;
-            transition: transform 0.2s;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .cta-button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+            background-color: var(--color-light-green);
+            color: white;
         }
 
         .section {
@@ -217,6 +229,24 @@
             font-size: 0.9rem;
         }
 
+        .trial-badge {
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            background: var(--color-dark-teal);
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 130px;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2rem;
@@ -257,13 +287,16 @@
 
     <section class="hero">
         <div class="hero-content">
-            <img src="/shared_images/logo.png" alt="local" class="hero-logo">
             <div class="hero-text">
-                <h1><span>Local</span> Produce</h1>
+                <h1>Fresh <span>Local</span> Produce</h1>
+                <p>Supporting local farmers and merchants by bringing fresh, seasonal produce directly to your door</p>
+                <a href="/customer-portal/products.html" class="cta-button">
+                    <i class="fas fa-shopping-basket"></i>
+                    Browse Products
+                </a>
             </div>
-            <p>Connecting you directly with farmers and independent producers in your area</p>
-            <a href="/customer-portal/products.html" class="cta-button">Shop Local Products</a>
         </div>
+        <div class="trial-badge">Belper Trial Edition</div>
     </section>
 
     <section class="section">

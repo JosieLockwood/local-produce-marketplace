@@ -194,6 +194,70 @@
             object-fit: cover;
         }
 
+        .rating-stars {
+            color: #ffd700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-count {
+            font-size: 0.9rem;
+            color: #666;
+            margin-left: 0.5rem;
+        }
+
+        .rating-form {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .star-input {
+            display: none;
+        }
+
+        .star-label {
+            color: #ddd;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .star-label:hover,
+        .star-label:hover ~ .star-label,
+        .star-input:checked ~ .star-label {
+            color: #ffd700;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .submit-rating {
+            background-color: var(--color-medium-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .submit-rating:hover {
+            background-color: var(--color-deep-green);
+        }
+
         .locality-badge {
             position: absolute;
             top: 10px;
@@ -240,12 +304,36 @@
         }
 
         .product-card {
-            background-color: white;
+            background: white;
             border-radius: 8px;
-            overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
             display: flex;
             flex-direction: column;
+        }
+
+        .product-card.out-of-stock {
+            opacity: 0.7;
+            position: relative;
+        }
+
+        .out-of-stock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+
+        .product-card.out-of-stock .add-to-cart-btn,
+        .product-card.out-of-stock .quantity-selector {
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         .product-info {
@@ -377,6 +465,85 @@
             color: white;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            max-width: 600px;
+            max-height: 80vh;
+            margin: 5vh auto;
+            border-radius: 8px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-dark-teal);
+        }
+
+        .review-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-rating {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-comment {
+            color: var(--color-dark-teal);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .review-date {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .search-container {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--color-medium-green);
+            border-radius: 4px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 1rem;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--color-deep-green);
+            box-shadow: 0 0 0 2px rgba(85,130,87,0.1);
+        }
+
         @keyframes slideIn {
             from { transform: translateX(100%); }
             to { transform: translateX(0); }
@@ -407,6 +574,13 @@
     </nav>
 
     <main class="main-content">
+        <div class="search-container">
+            <input type="text" 
+                   class="search-box" 
+                   placeholder="Search products..." 
+                   id="product-search"
+                   oninput="displayProducts(allProducts)">
+        </div>
         <div class="filters">
             <select class="filter-select" id="category-filter">
                 <option value="">All Categories</option>
@@ -442,6 +616,14 @@
             <!-- Products will be loaded here -->
         </div>
     </main>
+
+    <div id="reviewsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeReviewsModal()">&times;</span>
+            <h2>Product Reviews</h2>
+            <div id="reviewsList"></div>
+        </div>
+    </div>
 
     <script>
         // Initialize products array
@@ -489,49 +671,74 @@
             return icons[locality] || 'fa-tag';
         }
 
-        function displayProducts(products) {
-            const container = document.getElementById('products-container');
-            const filteredProducts = filterProducts(products);
+        async function displayProducts(products) {
+            const categoryFilter = document.getElementById('category-filter').value;
+            const merchantFilter = document.getElementById('merchant-filter').value;
+            const searchQuery = document.getElementById('product-search').value.toLowerCase();
+            
+            let filteredProducts = filterProducts(products);
 
-            if (!filteredProducts.length) {
-                container.innerHTML = '<p>No products found</p>';
-                return;
+            if (categoryFilter) {
+                filteredProducts = filteredProducts.filter(p => p.category === categoryFilter);
+            }
+            if (merchantFilter) {
+                filteredProducts = filteredProducts.filter(p => p.merchantId.businessName === merchantFilter);
+            }
+            if (searchQuery) {
+                filteredProducts = filteredProducts.filter(p => 
+                    p.item.toLowerCase().includes(searchQuery) || 
+                    p.description.toLowerCase().includes(searchQuery)
+                );
             }
 
-            container.innerHTML = filteredProducts.map(product => {
-                const merchantInfo = product.merchantId || {};
-                const merchantName = merchantInfo.businessName || 'Unknown';
-                const merchantLocation = merchantInfo.locationString || '';
-                
-                return `
-                    <div class="product-card" data-category="${product.category}" data-merchant="${merchantName}">
-                        <div class="product-image-container">
-                            <img src="${product.image || '/shared_images/product_placeholder.jpeg'}" alt="${product.item}" class="product-image">
-                            <div class="locality-badge ${product.localityCategory}">
-                                <i class="fas ${getLocalityIcon(product.localityCategory)}"></i>
-                                ${getLocalityLabel(product.localityCategory)}
-                            </div>
+            const productsContainer = document.getElementById('products-container');
+            productsContainer.innerHTML = '';
+
+            for (const product of filteredProducts) {
+                // Get ratings for product
+                const ratingsResponse = await fetch(`/api/customer/ratings/product/${product._id}`);
+                const ratingsData = await ratingsResponse.json();
+                const avgRating = ratingsData.averageRating;
+                const totalRatings = ratingsData.totalRatings;
+
+                const productCard = document.createElement('div');
+                productCard.className = `product-card ${!product.inStock ? 'out-of-stock' : ''}`;
+                productCard.innerHTML = `
+                    <div class="product-image-container">
+                        ${!product.inStock ? '<div class="out-of-stock-badge">Out of Stock</div>' : ''}
+                        <img src="${product.image || '/shared_images/product_placeholder.jpeg'}" 
+                            alt="${product.item}" class="product-image">
+                        <div class="locality-badge ${product.localityCategory}">
+                            <i class="fas ${getLocalityIcon(product.localityCategory)}"></i>
+                            ${getLocalityLabel(product.localityCategory)}
                         </div>
-                        <div class="product-info">
-                            <h3 class="product-title">${product.item}</h3>
-                            <p class="product-merchant">${merchantName}</p>
-                            <p class="product-location">${merchantLocation}</p>
-                            <p class="product-description">${product.description || ''}</p>
-                            <p class="product-price">£${product.price.toFixed(2)} / ${product.unit}</p>
-                            <div class="cart-actions">
-                                <div class="quantity-selector">
-                                    <label for="quantity-${product._id}">Qty:</label>
-                                    <input type="number" id="quantity-${product._id}" value="1" min="1" max="99">
-                                </div>
-                                <button onclick="addToCart('${product._id}')" class="add-to-cart-btn">
-                                    <i class="fas fa-cart-plus"></i>
-                                    Add to Cart
-                                </button>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.item}</h3>
+                        ${avgRating ? `
+                            <div class="rating-stars" onclick="showReviews('${product._id}')" style="cursor: pointer;">
+                                ${Array(Math.round(avgRating)).fill('<i class="fas fa-star"></i>').join('')}
+                                ${Array(5 - Math.round(avgRating)).fill('<i class="far fa-star"></i>').join('')}
+                                <span class="rating-count">(${totalRatings})</span>
                             </div>
+                        ` : ''}
+                        <p class="product-merchant">${product.merchantId.businessName}</p>
+                        <p class="product-location">${product.merchantId.locationString}</p>
+                        <p class="product-description">${product.description || ''}</p>
+                        <p class="product-price">£${product.price.toFixed(2)} / ${product.unit}</p>
+                        <div class="cart-actions">
+                            <div class="quantity-selector">
+                                <label for="quantity-${product._id}">Qty:</label>
+                                <input type="number" id="quantity-${product._id}" value="1" min="1" max="99">
+                            </div>
+                            <button onclick="addToCart('${product._id}')" class="add-to-cart-btn">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
                         </div>
                     </div>
                 `;
-            }).join('');
+                productsContainer.appendChild(productCard);
+            }
         }
 
         // Add click handlers for locality filter buttons
@@ -675,6 +882,39 @@
             document.querySelectorAll('.locality-btn').forEach(btn => btn.classList.remove('active'));
             activeLocalities.clear(); // Clear all active localities
             displayProducts(allProducts);
+        }
+
+        function submitRating() {
+            // TO DO: implement rating submission logic
+            console.log('Rating submitted!');
+        }
+
+        async function showReviews(productId) {
+            try {
+                const response = await fetch(`/api/customer/ratings/product/${productId}/reviews`);
+                const reviews = await response.json();
+                
+                const reviewsList = document.getElementById('reviewsList');
+                reviewsList.innerHTML = reviews.length ? reviews.map(review => `
+                    <div class="review-item">
+                        <div class="review-rating">
+                            ${Array(review.rating).fill('<i class="fas fa-star"></i>').join('')}
+                            ${Array(5 - review.rating).fill('<i class="far fa-star"></i>').join('')}
+                        </div>
+                        ${review.comment ? `<div class="review-comment">${review.comment}</div>` : ''}
+                        <div class="review-date">${new Date(review.createdAt).toLocaleDateString()}</div>
+                    </div>
+                `).join('') : '<p>No reviews yet</p>';
+                
+                document.getElementById('reviewsModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+                showNotification('Failed to load reviews');
+            }
+        }
+
+        function closeReviewsModal() {
+            document.getElementById('reviewsModal').style.display = 'none';
         }
     </script>
 </body>

@@ -469,15 +469,21 @@
                 
                 const select = document.getElementById('delivery-date');
                 select.innerHTML = '<option value="">Select delivery date</option>' +
-                    dates.map(d => `
-                        <option value="${d._id}">
-                            ${new Date(d.date).toLocaleDateString('en-GB', {
-                                weekday: 'long',
-                                day: 'numeric',
-                                month: 'long'
-                            })} (${d.slotsAvailable} slots available)
-                        </option>
-                    `).join('');
+                    dates.map(d => {
+                        const isFull = d.orderCount >= d.maxOrders;
+                        const remainingSlots = d.maxOrders - d.orderCount;
+                        const date = new Date(d.date).toLocaleDateString('en-GB', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long'
+                        });
+                        
+                        return `
+                            <option value="${d._id}" ${isFull ? 'disabled' : ''}>
+                                ${date} (${isFull ? 'FULL' : `${remainingSlots} slots remaining`})
+                            </option>
+                        `;
+                    }).join('');
             } catch (error) {
                 console.error('Error loading delivery dates:', error);
                 document.getElementById('delivery-date').innerHTML = 
@@ -556,7 +562,7 @@
                 
                 // Show success message and redirect
                 alert('Order placed successfully!');
-                window.location.href = '/customer-portal/orders.html';
+                window.location.href = '/customer-portal/account.html';
 
             } catch (error) {
                 alert(error.message || 'Failed to place order. Please try again.');

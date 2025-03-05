@@ -9,8 +9,13 @@ const deliveryDateSchema = new mongoose.Schema({
     status: { 
         type: String, 
         required: true,
-        enum: ['open', 'closed', 'past'],
+        enum: ['open', 'closed', 'full', 'past'],
         default: 'open'
+    },
+    maxOrders: {
+        type: Number,
+        required: true,
+        min: 1
     }
 }, {
     timestamps: true
@@ -34,6 +39,24 @@ deliveryDateSchema.statics.updatePastDates = async function() {
         },
         { status: 'past' }
     );
+};
+
+// Static method to check and update full status
+deliveryDateSchema.statics.checkAndUpdateFullStatus = async function(deliveryDateId) {
+    const Order = mongoose.model('Order');
+    const deliveryDate = await this.findById(deliveryDateId);
+    
+    if (!deliveryDate || deliveryDate.status === 'past') return;
+
+    const orderCount = await Order.countDocuments({ deliveryDate: deliveryDateId });
+    
+    if (orderCount >= deliveryDate.maxOrders && deliveryDate.status !== 'full') {
+        deliveryDate.status = 'full';
+        await deliveryDate.save();
+    } else if (orderCount < deliveryDate.maxOrders && deliveryDate.status === 'full') {
+        deliveryDate.status = 'open';
+        await deliveryDate.save();
+    }
 };
 
 module.exports = mongoose.model('DeliveryDate', deliveryDateSchema);

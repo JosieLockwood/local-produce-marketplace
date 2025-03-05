@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Ratings | Merchant Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-light-yellow: #E3E566;
+            --color-light-green: #A5CF61;
+            --color-medium-green: #6F9B3C;
+            --color-deep-green: #558257;
+            --color-dark-teal: #264E49;
+            --color-cream: #f5f5f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-dark-teal);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--color-dark-teal);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--color-dark-teal);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--color-medium-green);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .rating-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-stars {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .rating-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .rating-product {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-customer {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-comment {
+            background-color: var(--color-cream);
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+
+        .no-ratings {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="/merchant-portal/" class="logo">
+                <img src="../shared_images/logo.png" alt="Local Logo">
+                local
+            </a>
+            <div class="nav-links">
+                <a href="/merchant-portal/products.html">
+                    <i class="fas fa-box"></i> Products
+                </a>
+                <a href="/merchant-portal/orders.html">
+                    <i class="fas fa-shopping-cart"></i> Orders
+                </a>
+                <a href="/merchant-portal/ratings.html" class="active">
+                    <i class="fas fa-star"></i> Ratings
+                </a>
+                <button id="logout-button" class="auth-button">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="section">
+            <h2>Product Ratings & Reviews</h2>
+            <div id="ratings-list">
+                <!-- Ratings will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check auth
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/merchant-portal/';
+        }
+
+        // Get merchant ID from token
+        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+        const merchantId = tokenPayload.merchantId;
+
+        // Load ratings
+        async function loadRatings() {
+            try {
+                const response = await fetch(`/api/customer/ratings/merchant/${merchantId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch ratings');
+                }
+
+                const ratings = await response.json();
+                const ratingsList = document.getElementById('ratings-list');
+
+                if (ratings.length === 0) {
+                    ratingsList.innerHTML = '<div class="no-ratings">No ratings yet</div>';
+                    return;
+                }
+
+                ratingsList.innerHTML = ratings.map(rating => `
+                    <div class="rating-card">
+                        <div class="rating-header">
+                            <div class="rating-stars">
+                                ${Array(5).fill('').map((_, i) => 
+                                    `<i class="fa${i < rating.rating ? 's' : 'r'} fa-star"></i>`
+                                ).join('')}
+                            </div>
+                            <div class="rating-date">
+                                ${new Date(rating.createdAt).toLocaleDateString()}
+                            </div>
+                        </div>
+                        <div class="rating-product">
+                            ${rating.productId.item} - £${rating.productId.price.toFixed(2)}
+                        </div>
+                        <div class="rating-customer">
+                            Reviewed by ${rating.userId.name}
+                        </div>
+                        ${rating.comment ? `
+                            <div class="rating-comment">
+                                "${rating.comment}"
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading ratings:', error);
+                if (error.message === 'Invalid token') {
+                    localStorage.removeItem('token');
+                    window.location.href = '/merchant-portal/';
+                }
+            }
+        }
+
+        // Handle logout
+        document.getElementById('logout-button').onclick = () => {
+            localStorage.removeItem('token');
+            window.location.href = '/merchant-portal/';
+        };
+
+        // Initialize
+        loadRatings();
+    </script>
+</body>
+</html>
